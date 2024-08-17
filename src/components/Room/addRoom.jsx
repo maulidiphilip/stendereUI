@@ -1,23 +1,20 @@
-import { useState } from "react";
-import addRoom from "../Utils/ApiFunctions";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { addRoom } from "../Utils/ApiFunctions";
+import RoomTypeSelector from "../common/RoomTypeSelector";
 
 const AddRoom = () => {
-  // varibale to hold the information
   const [newRoom, setNewRoom] = useState({
     photo: null,
     roomType: "",
     roomPrice: "",
   });
 
-  // variable to handle image previewing, because we are going to preview image b4 submitting to the database
-  const [imagePreview, setImagePreview] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
 
   const handleRoomInputChange = (e) => {
     const name = e.target.name;
-
     let value = e.target.value;
     if (name === "roomPrice") {
       if (!isNaN(value)) {
@@ -35,46 +32,66 @@ const AddRoom = () => {
     setImagePreview(URL.createObjectURL(selectedImage));
   };
 
-  // function to handle the submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const success = await addRoom(
         newRoom.photo,
         newRoom.roomType,
         newRoom.roomPrice
       );
-      if (success !==undefined) {
-        setSuccessMessage("A new room created");
+      if (success !== undefined) {
+        setSuccessMessage("New room added successfully !");
         setNewRoom({ photo: null, roomType: "", roomPrice: "" });
         setImagePreview("");
         setErrorMessage("");
       } else {
-        setErrorMessage("Error in adding room!!!!");
+        setErrorMessage("Error in creating room");
       }
     } catch (error) {
       setErrorMessage(error.message);
     }
+    setTimeout(() => {
+      setSuccessMessage("");
+      setErrorMessage("");
+    }, 3000);
   };
+
   return (
     <>
-      <section className="container, mt-5 mb-5">
+      <section className="container mt-5 mb-5">
         <div className="row justify-content-center">
-          <div className="col-md-8 col-lg-6 ">
-            <h2 className="mt-5 mb-2">Create a Room</h2>
+          <div className="col-md-8 col-lg-6">
+            <h2 className="mt-5 mb-2">Create a  Room</h2>
+            {successMessage && (
+              <div className="alert alert-success fade show">
+                {" "}
+                {successMessage}
+              </div>
+            )}
 
-            <form action="" onSubmit={handleSubmit}>
+            {errorMessage && (
+              <div className="alert alert-danger fade show">
+                {" "}
+                {errorMessage}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label htmlFor="roomType" className="form-label">
                   Room Type
                 </label>
-                <div></div>
+                <div>
+                  <RoomTypeSelector
+                    handleRoomInputChange={handleRoomInputChange}
+                    newRoom={newRoom}
+                  />
+                </div>
               </div>
-
               <div className="mb-3">
                 <label htmlFor="roomPrice" className="form-label">
-                  Room price
+                  Room Price
                 </label>
                 <input
                   required
@@ -108,12 +125,11 @@ const AddRoom = () => {
                   ></img>
                 )}
               </div>
-
               <div className="d-grid gap-2 d-md-flex mt-2">
-								<button type="submit" className="btn btn-outline-primary ml-5">
-									Create Room
-								</button>
-							</div>
+                <button type="submit" className="btn btn-outline-primary ml-5">
+                  Save Room
+                </button>
+              </div>
             </form>
           </div>
         </div>
