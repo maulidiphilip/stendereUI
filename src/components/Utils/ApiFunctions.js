@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-    baseURL : "http://localhost:8080"
+    baseURL : "http://localhost:9192"
 })
 
 export const getHeader = () => {
@@ -19,7 +19,7 @@ export async function addRoom(photo, roomType, roomPrice) {
 	formData.append("roomType", roomType)
 	formData.append("roomPrice", roomPrice)
 
-	const response = await api.post("/rooms/add/new-rooms", formData)
+	const response = await api.post("/rooms/add/new-room", formData)
 	if (response.status === 201) {
 		return true
 	} else {
@@ -34,5 +34,16 @@ export async function getRoomTypes() {
 		return response.data
 	} catch (error) {
 		throw new Error("Error fetching room types")
+	}
+}
+
+// function to get all the room from the backend/database 
+export async function getAllRooms(){
+	try {
+		const results = await api.get("/rooms/all-rooms")
+		return results.data
+	} catch (error) {
+		throw new Error("Error fetching rooms");
+		
 	}
 }
