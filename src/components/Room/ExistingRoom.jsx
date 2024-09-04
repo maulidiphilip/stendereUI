@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getAllRooms } from "../Utils/ApiFunctions";
+import { deleteRoom, getAllRooms } from "../Utils/ApiFunctions";
 import RoomFilter from "../common/RoomFilter";
 import { Col, Row } from "react-bootstrap";
 import RoomPaginator from "../common/RoomPaginator";
+import { FaEdit, FaEye, FaTrashAlt } from "react-icons/fa";
+import { Link } from "react-router-dom";
 // this component is there to display rooms and it will utilize the room Paginator and room filter component
 const ExistingRoom = () => {
   const [rooms, setRooms] = useState([]);
@@ -41,10 +43,28 @@ const ExistingRoom = () => {
     }
     setCurrentPage(1);
   }, [rooms, selectedRoomType]);
-   
+
   const handlePaginationClick = (pageNumber) => {
-    setCurrentPage(pageNumber)
-  }
+    setCurrentPage(pageNumber);
+  };
+
+  const handleDelete = async (roomId) => {
+    try {
+      const result = await deleteRoom(roomId);
+      if (result === "") {
+        setSuccessMessage(`Room No. ${roomId} successifully removed`);
+        fetchRooms();
+      } else {
+        console.error(`Error deleting rooms : ${result.message}`);
+      }
+    } catch (error) {
+      setErrorMessage(error.message);
+      setTimeout(() => {
+        setSuccessMessage("");
+        setErrorMessage("");
+      }, 3000);
+    }
+  };
 
   const calculateTotalPages = (filteredRooms, roomsPerPage, rooms) => {
     const totalRooms =
@@ -80,11 +100,24 @@ const ExistingRoom = () => {
             <tbody>
               {currentRooms.map((room) => (
                 <tr key={room.id} className="text-center">
+                  <td>{room.id}</td>
                   <td>{room.roomType}</td>
                   <td>{room.roomPrice}</td>
-                  <td>
-                    <button className="">View/Edit</button>
-                    <button>Delete</button>
+                  <td className="gap-3">
+                    <Link to={`/edit-room/${room.id}`}>
+                      <span className="btn btn-info btn-sm">
+                        <FaEye/>
+                      </span>
+                      <span className="btn btn-warning btn-sm">
+                        <FaEdit/>
+                      </span>
+                    </Link>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(room.id)}
+                    >
+                      <FaTrashAlt/>
+                    </button>
                   </td>
                 </tr>
               ))}
