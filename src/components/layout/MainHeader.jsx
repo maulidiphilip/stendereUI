@@ -1,6 +1,6 @@
 import React from "react";
 
-const Header = () => {
+const MainHeader = () => {
   return (
     <header className="header-banner">
       <div className="overlay"></div>
@@ -14,4 +14,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default MainHeader;

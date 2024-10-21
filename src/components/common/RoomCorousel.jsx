@@ -1,0 +1,67 @@
+import { useEffect, useState } from "react";
+import { getAllRooms } from "../Utils/ApiFunctions";
+import { Link } from "react-router-dom";
+import { Card, Carousel, Col, Container, Row } from "react-bootstrap";
+
+const RoomCorousel = () => {
+  const [rooms, setRooms] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // get all the rooms
+  useEffect(() => {
+    setIsLoading(true);
+    getAllRooms()
+      .then((data) => {
+        setRooms(data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+        setIsLoading(false);
+      });
+  }, []);
+
+  if (isLoading) {
+    return <div className="mt-5">Room Loading...</div>;
+  }
+
+  if (errorMessage) {
+    return <div className="text-danger mb-5 mt-5">error : {errorMessage}</div>;
+  }
+  return (
+    <section className="bb-light mb-5 mt-5 shadow">
+      <Link to={"/browse-all-rooms"} className="hotel-color text-center">
+        Browse all rooms
+      </Link>
+
+      <Container>
+        <Carousel indicators={false}>
+          {[...Array(Math.ceil(rooms.length / 4))].map((_, index) => (
+            <Carousel.Item key={index}>
+              <Row>
+                {rooms.slice(index * 4, index * 4 + 4).map((room) => (
+                  <Col key={room.id} className="mb-4" xs={12} md={6} lg={3}>
+                    <Card>
+                      <Link to={`/book-room/${room.id}`}>
+                        <Card.Img
+                          variant="top"
+                          src={`data:image/png;base64, ${room.photo}`}
+                          alt="Room Photo"
+                          className="w-100"
+                          style={{ height: "200px" }}
+                        />
+                      </Link>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </Carousel.Item>
+          ))}
+        </Carousel>
+      </Container>
+    </section>
+  );
+};
+
+export default RoomCorousel;
