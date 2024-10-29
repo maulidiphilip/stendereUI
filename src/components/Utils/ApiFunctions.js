@@ -77,3 +77,54 @@ export async function getRoomById(roomId) {
 		throw new Error(`Error fetching room ${error.message}`);
 	}
 }
+
+// function to book the room
+export async function bookRoom(roomId, booking) {
+	try {
+		const response = await api.post(`/bookings/room/${roomId}/booking`, booking)
+
+		return response.data
+	} catch (error) {
+		if (error.response && error.response.data) {
+			throw new Error(error.response.data)
+		} else {
+			throw new Error(`Error booking room : ${error.message}`);
+			
+		}
+	}
+}
+
+// get all booking from the atabase
+export async function getAllBooking() {
+	try {
+		const result = await api.get("/bookings/all-bookings")
+		return result.data
+	} catch (error) {
+		throw new Error(`Failed to get bookings: ${error.message}`);
+	}
+}
+
+// now find bookings by confirmation code 
+export async function getBookingByConfirmationCode(confirmationCode){
+	try {
+	const result = await api.get(`/bookings/confirmation/${confirmationCode}`)
+	return result.data
+	} catch (error) {
+		if(error.response && error.response.data){
+			throw new Error(error.response);
+		} else {
+			throw new Error(`Error finding booking: ${error.message}`);
+			
+		}
+	}
+}
+
+// method to cancel bookings
+export async function cancelBooking(bookingId) {
+	try {
+		const results = await api.delete(`/bookings/booking/${bookingId}/delete`)
+		return results.data
+	} catch (error) {
+		throw new Error(`Error canclling booking : ${error.message}`);
+	}
+}

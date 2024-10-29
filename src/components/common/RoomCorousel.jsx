@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, Carousel, Col, Container, Row } from "react-bootstrap";
 
 const RoomCorousel = () => {
-  const [rooms, setRooms] = useState([]);
+  const [rooms, setRooms] = useState([{ id: "", roomType: "", roomPrice: "", photo: "" }]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,6 +52,22 @@ const RoomCorousel = () => {
                           style={{ height: "200px" }}
                         />
                       </Link>
+                      <Card.Body>
+                        <Card.Title className="hotel-color">
+                          {room.roomType}
+                        </Card.Title>
+                        <Card.Title className="room-price">
+                          ${room.roomPrice}/night
+                        </Card.Title>
+                        <div className="flex-shrink-0">
+                          <Link
+                            to={`/book-room/${room.id}`}
+                            className="btn btn-hotel btn-sm"
+                          >
+                            Book Now
+                          </Link>
+                        </div>
+                      </Card.Body>
                     </Card>
                   </Col>
                 ))}
