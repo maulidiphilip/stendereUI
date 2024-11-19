@@ -4,10 +4,11 @@ import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { Form, FormControl, FormGroup } from "react-bootstrap";
+import BookingSummary from "./BookingSummary";
 
 const BookingForm = () => {
   const [validated, setIsValidated] = useState(false);
-  const [submit, setIsSubmitted] = useState(false);
+  const [isSubmit, setIsSubmitted] = useState(false);
   const [errMessage, setErrMessage] = useState("");
   const [roomPrice, setRoomPrice] = useState(0);
   const [booking, setBooking] = useState({
@@ -25,8 +26,8 @@ const BookingForm = () => {
     roomPrice: "",
   });
 
-  const [roomId] = useParams();
-  const navigate = useNavigate();
+  const { roomId } = useParams()
+	const navigate = useNavigate()
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -248,10 +249,22 @@ const BookingForm = () => {
                 </fieldset>
 
                 <div className="form-group mt-2 mb-2">
-                  <button className="btn btn-hotel" type="submit">Proceed to Booking summary</button>
+                  <button className="btn btn-hotel" type="submit">
+                    Proceed to Booking summary
+                  </button>
                 </div>
               </Form>
             </div>
+          </div>
+          <div className="col-md-6">
+            {isSubmit && (
+              <BookingSummary
+                booking={booking}
+                payment={calculatePayment()}
+                onConfirm={handleBooking}
+                isFormValid={validated}
+              />
+            )}
           </div>
         </div>
       </div>
