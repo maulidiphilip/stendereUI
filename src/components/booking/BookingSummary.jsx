@@ -31,7 +31,7 @@ const BookingSummary = ({ booking, payment, isFormValid, onConfirm }) => {
     <div className="card card-body mt-5">
       <h4>Reservation Summary</h4>
       <p>
-        Full Name : <strong>{booking.guestName}</strong>
+        Full Name : <strong>{booking.guestFullName}</strong>
       </p>
       <p>
         Email : <strong>{booking.guestEmail}</strong>
@@ -45,7 +45,7 @@ const BookingSummary = ({ booking, payment, isFormValid, onConfirm }) => {
         <strong>{moment(booking.checkOutDate).format("MMM Do YYYY")}</strong>
       </p>
       <p>
-        Number of Days : <strong>{booking.numberOfDays}</strong>
+      Masiku Okhala nafe: <strong>{numberOfDays}</strong>
       </p>
       <div>
         <h4>Number of Guest</h4>

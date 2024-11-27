@@ -12,7 +12,7 @@ const BookingForm = () => {
   const [errMessage, setErrMessage] = useState("");
   const [roomPrice, setRoomPrice] = useState(0);
   const [booking, setBooking] = useState({
-    guestName: "",
+    guestFullName: "",
     guestEmail: "",
     checkInDate: "",
     checkOutDate: "",
@@ -50,13 +50,27 @@ const BookingForm = () => {
 
   // a function to calculate the price based on the number of rooms selected by the room
   const calculatePayment = () => {
+    if (!booking?.checkInDate || !booking?.checkOutDate) {
+      return 0; // Return 0 if dates are invalid or undefined
+    }
+  
     const checkInDate = moment(booking.checkInDate);
     const checkOutDate = moment(booking.checkOutDate);
-
-    const diffInDays = checkOutDate.diff(checkInDate);
+  
+    if (!checkInDate.isValid() || !checkOutDate.isValid()) {
+      throw new Error("Invalid check-in or check-out date");
+    }
+  
+    const diffInDays = checkOutDate.diff(checkInDate, 'days');
+    if (diffInDays < 0) {
+      throw new Error("Check-out date must be after check-in date");
+    }
+  
     const paymentPricePerDay = roomPrice ? roomPrice : 0;
+  
     return diffInDays * paymentPricePerDay;
   };
+  
 
   const isGuestCountValid = () => {
     const adultCount = parseInt(booking.numOfAdults);
@@ -99,10 +113,10 @@ const BookingForm = () => {
     try {
       const confirmationCode = await bookRoom(roomId, booking);
       setIsSubmitted(true);
-      navigate("/", { state: { message: confirmationCode } });
+      navigate("/booking-success", { state: { message: confirmationCode } });
     } catch (error) {
       setErrMessage(error.message);
-      navigate("/", { state: { error: errMessage } });
+      navigate("/booking-success", { state: { error: errMessage } });
     }
   };
 
@@ -115,16 +129,16 @@ const BookingForm = () => {
               <h3 className="card card-title">Reserve Room</h3>
               <Form noValidate validated={validated} onSubmit={handleSubmit}>
                 <Form.Group>
-                  <Form.Label htmlFor="guestName" className="">
+                  <Form.Label htmlFor="guestFullName" className="">
                     Full Name :{" "}
                   </Form.Label>
 
                   <FormControl
                     required
                     type="text"
-                    id="guestName"
-                    name="guestName"
-                    value={booking.guestName}
+                    id="guestFullName"
+                    name="guestFullName"
+                    value={booking.guestFullName}
                     placeholder="Enter fullname"
                     onChange={handleInputChange}
                   />
@@ -136,7 +150,7 @@ const BookingForm = () => {
 
                 <Form.Group>
                   <Form.Label htmlFor="guestEmail" className="hotel-color">
-                    Email
+                    Email :
                   </Form.Label>
                   <FormControl
                     required
@@ -146,7 +160,6 @@ const BookingForm = () => {
                     value={booking.guestEmail}
                     placeholder="Enter your email"
                     onChange={handleInputChange}
-                    disabled
                   />
                   <Form.Control.Feedback type="invalid">
                     Please enter a valid email address.
