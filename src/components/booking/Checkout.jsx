@@ -12,6 +12,7 @@ import {
   FaWifi,
   FaWineGlassAlt,
 } from "react-icons/fa";
+import RoomCorousel from "../common/RoomCorousel"
 
 const Checkout = () => {
   // state variables
@@ -67,7 +68,7 @@ const Checkout = () => {
                     </tr>
                     <tr>
                       <th>Price per night:</th>
-                      <td>MKW{roomInfo.roomPrice}</td>
+                      <td>MKW {roomInfo.roomPrice}</td>
                     </tr>
                     <tr>
                       <th>Room Service:</th>
@@ -107,6 +108,9 @@ const Checkout = () => {
           </div>
         </div>
       </section>
+      <div className="container ">
+        <RoomCorousel />
+      </div>
     </div>
   );
 };
