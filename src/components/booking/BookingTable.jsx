@@ -1,18 +1,21 @@
 import { parseISO } from "date-fns";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import DateSlider from "../common/DateSlider";
 
-const BookingTable = (bookingInfo, handleBookingCancellation) => {
-  const [filteredBookings, setFilteredBookings] = useState(bookingInfo);
+const BookingsTable = ({ bookingInfo, handleBookingCancellation }) => {
+  // Ensure filteredBookings is always an array
+  const [filteredBookings, setFilteredBookings] = useState([]);
 
-  const filterBooknigs = (startDate, endDate) => {
+  const filterBookings = (startDate, endDate) => {
+    if (!Array.isArray(bookingInfo)) return;
+
     let filtered = bookingInfo;
     if (startDate && endDate) {
       filtered = bookingInfo.filter((booking) => {
-        const bookingStarDate = parseISO(booking.checkInDate);
+        const bookingStartDate = parseISO(booking.checkInDate);
         const bookingEndDate = parseISO(booking.checkOutDate);
         return (
-          bookingStarDate >= startDate &&
+          bookingStartDate >= startDate &&
           bookingEndDate <= endDate &&
           bookingEndDate > startDate
         );
@@ -21,21 +24,20 @@ const BookingTable = (bookingInfo, handleBookingCancellation) => {
     setFilteredBookings(filtered);
   };
 
-  //use effect to enable the loading when the date is changed
   useEffect(() => {
-    setFilteredBookings(bookingInfo);
+    setFilteredBookings(Array.isArray(bookingInfo) ? bookingInfo : []);
   }, [bookingInfo]);
-  return (
-    <section className="p-4 ">
-      <DateSlider
-        onDateChange={filterBooknigs}
-        onFilterChange={filterBooknigs}
-      />
 
+  return (
+    <section className="p-4">
+      <DateSlider
+        onDateChange={filterBookings}
+        onFilterChange={filterBookings}
+      />
       <table className="table table-bordered table-hover shadow">
         <thead>
           <tr>
-            <th>Booking Serial No.</th>
+            <th>Serial Booking No.</th>
             <th>Booking ID</th>
             <th>Room ID</th>
             <th>Room Type</th>
@@ -50,39 +52,43 @@ const BookingTable = (bookingInfo, handleBookingCancellation) => {
             <th colSpan={2}>Actions</th>
           </tr>
         </thead>
-
         <tbody className="text-center">
-          {filteredBookings.map((booking, index) => (
-            <tr key={booking.id}>
-              <td>{index + 1}</td>
-              <td>{booking.id}</td>
-              <td>{booking.room.id}</td>
-              <td>{booking.room.roomType}</td>
-              <td>{booking.checkInDate}</td>
-              <td>{booking.checkOutDate}</td>
-              <td>{booking.guestName}</td>
-              <td>{booking.guestEmail}</td>
-              <td>{booking.numOfAdults}</td>
-              <td>{booking.numOfChildren}</td>
-              <td>{booking.totalNumOfGuests}</td>
-              <td>{booking.bookingConfirmationCode}</td>
-              <td>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleBookingCancellation(booking.id)}
-                >
-                  Cancel
-                </button>
-              </td>
-            </tr>
-          ))}
+          {filteredBookings?.map((booking, index) => {
+            if (!booking || !booking.roomResponse) return null; // Safeguard against undefined or missing data
+
+            return (
+              <tr key={booking.bookingId}>
+                <td>{index + 1}</td>
+                <td>{booking.bookingId}</td>
+                <td>{booking.roomResponse?.id || "N/A"}</td>{" "}
+                {/* Access roomResponse properties */}
+                <td>{booking.roomResponse?.roomType || "N/A"}</td>
+                <td>{booking.checkInDate || "N/A"}</td>
+                <td>{booking.getCheckOutDate || "N/A"}</td>
+                <td>{booking.guestFullName || "N/A"}</td>
+                <td>{booking.guestEmail || "N/A"}</td>
+                <td>{booking.numOfAdults || 0}</td>
+                <td>{booking.numOfChildren || 0}</td>
+                <td>{booking.totalNumOfGuest || 0}</td>
+                <td>{booking.bookingConfirmationCode || "N/A"}</td>
+                <td>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleBookingCancellation(booking.bookingId)}
+                  >
+                    Cancel
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-      {filterBooknigs.length === 0 && (
-        <p> No booking found for the selected dates</p>
+      {filteredBookings.length === 0 && (
+        <p>No booking found for the selected dates</p>
       )}
     </section>
   );
 };
 
-export default BookingTable;
+export default BookingsTable;

@@ -1,6 +1,7 @@
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { DateRangePicker } from "react-date-range";
+import { useState } from "react";
 
 const DateSlider = ({ onDateChange, onFilterChange }) => {
   const [dateRange, setDateRange] = useState({
