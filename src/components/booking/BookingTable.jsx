@@ -3,36 +3,59 @@ import { useState, useEffect } from "react";
 import DateSlider from "../common/DateSlider";
 
 const BookingsTable = ({ bookingInfo, handleBookingCancellation }) => {
-  // Ensure filteredBookings is always an array
-  const [filteredBookings, setFilteredBookings] = useState([]);
+  const [filteredBookings, setFilteredBookings] = useState(bookingInfo);
 
-  const filterBookings = (startDate, endDate) => {
-    if (!Array.isArray(bookingInfo)) return;
-
+  const filterBooknigs = (startDate, endDate) => {
     let filtered = bookingInfo;
+
     if (startDate && endDate) {
       filtered = bookingInfo.filter((booking) => {
-        const bookingStartDate = parseISO(booking.checkInDate);
-        const bookingEndDate = parseISO(booking.checkOutDate);
-        return (
-          bookingStartDate >= startDate &&
-          bookingEndDate <= endDate &&
-          bookingEndDate > startDate
-        );
+        try {
+          // Validate and parse dates
+          const bookingStartDate = booking?.checkInDate
+            ? parseISO(booking.checkInDate)
+            : null;
+          const bookingEndDate = booking?.getCheckOutDate
+            ? parseISO(booking.getCheckOutDate)
+            : null;
+
+          // Skip invalid or missing dates
+          if (
+            !bookingStartDate ||
+            !bookingEndDate ||
+            isNaN(bookingStartDate) ||
+            isNaN(bookingEndDate)
+          ) {
+            console.warn("Skipping booking with invalid dates:", booking);
+            return false;
+          }
+
+          // Filter based on the provided date range
+          return (
+            bookingStartDate >= new Date(startDate) &&
+            bookingEndDate <= new Date(endDate) &&
+            bookingEndDate > new Date(startDate)
+          );
+        } catch (error) {
+          console.error("Invalid date encountered:", error, booking);
+          return false;
+        }
       });
     }
+
     setFilteredBookings(filtered);
   };
 
   useEffect(() => {
-    setFilteredBookings(Array.isArray(bookingInfo) ? bookingInfo : []);
+    // console.log("Booking Info:", bookingInfo);
+    setFilteredBookings(bookingInfo);
   }, [bookingInfo]);
 
   return (
     <section className="p-4">
       <DateSlider
-        onDateChange={filterBookings}
-        onFilterChange={filterBookings}
+        onDateChange={filterBooknigs}
+        onFilterChange={filterBooknigs}
       />
       <table className="table table-bordered table-hover shadow">
         <thead>
